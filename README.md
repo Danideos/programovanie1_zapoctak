@@ -1,0 +1,1 @@
+# programovanie1_zapoctak
