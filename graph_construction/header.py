@@ -12,6 +12,8 @@ place_name = "Prague"
 k_precision = 10 # How many k-closest nodes to consider when creating transfer edges
 url = "https://data.pid.cz/PID_GTFS.zip"
 save_path = "PID_GTFS.zip"
+min_transfer_time = 0
+transfer_penalty = 160
 
 # Classes
 class Node:
@@ -36,7 +38,6 @@ class EdgeSet:
     
     def getEdge(self, time, translator):
         # Returns departure time of the soonest departure with operational trip tid from the current time
-        
         low = 0
         high = len(self.edges) - 1
         while high >= low:
@@ -45,7 +46,9 @@ class EdgeSet:
                 for i in range(mid, len(self.edges)):
                     if translator.isEdgeOperational(self.edges[i][1], translator.date, time):
                         if self.edges[i][0] != -1:
-                            return self.edges[i][0], self.edges[i][2]
+                            """return self.edges[i][0], self.edges[i][2]"""
+                            if time + min_transfer_time <= self.edges[i][0]:
+                                return self.edges[i][0], self.edges[i][2]
                         else:
                             return time, -1
                 return False, False

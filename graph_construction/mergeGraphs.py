@@ -214,12 +214,7 @@ def getTripSchedules(trip_id_translation):
     
 def createMergedGraph(walk_nodes, walk_edges, pid_nodes, pid_edges, transfer_edges):
     print("Creating merged graph...", end=" ")
-    pid_edges.sort(key=lambda x: x[4]) 
-    pid_edges.sort(key=lambda x: x[2]) 
-    pid_edges.sort(key=lambda x: x[1]) 
-    pid_edges.sort(key=lambda x: x[0]) 
     merged_nodes = walk_nodes + pid_nodes
-    merged_edges = walk_edges + transfer_edges + pid_edges
 
     # Create final node representation
     final_nodes = []
@@ -227,25 +222,65 @@ def createMergedGraph(walk_nodes, walk_edges, pid_nodes, pid_edges, transfer_edg
         node_id, node_lon, node_lat = merged_nodes[i]
         node = H.Node(node_id, node_lon, node_lat)
         final_nodes.append(node)
-    
-    # Create final neighbor list representation with edge sets
+
+    # Create final neighbor list representation with edge sets. 
+    # For each pid trip create edge for each reachable node.
+
+    # Walk edge sets
     neigh_list = [[] for i in range(len(merged_nodes))]
-    root, goal, depart_time, travel_time, trip_tid, route_id = merged_edges[0]
-    edge_set = H.EdgeSet(root, goal, travel_time)
-    edge_set.addEdge(depart_time, trip_tid, route_id)
-    last_root = root
-    last_goal = goal
-    for i in range(1, len(merged_edges)):
-        root, goal, depart_time, travel_time, trip_tid, route_id = merged_edges[i]
-        if last_root == root and last_goal == goal:
-            edge_set.addEdge(depart_time, trip_tid, route_id)
-        else:
-            edge_set.sortEdges()
-            neigh_list[last_root].append(edge_set)
-            edge_set = H.EdgeSet(root, goal, travel_time)
-            edge_set.addEdge(depart_time, trip_tid, route_id)
-            last_root = root
-            last_goal = goal
+    edge_set_amount = len(walk_edges)
+    for walk_edge in walk_edges:
+        root, goal, depart_time, travel_time, trip_tid, route_id = walk_edge
+        edge_set = H.EdgeSet(root, goal, travel_time)
+        edge_set.addEdge(-1, -1, -1)
+        neigh_list[root].append(edge_set)
+    
+    # Transfer edge sets
+    edge_set_amount += len(transfer_edges)
+    for transfer_edge in transfer_edges:
+        root, goal, depart_time, travel_time, trip_tid, route_id = transfer_edge
+        edge_set = H.EdgeSet(root, goal, travel_time)
+        edge_set.addEdge(-1, -1, -1)
+        neigh_list[root].append(edge_set)
+    
+    # Pid edge sets
+    neigh_list_dict = [{} for i in range(len(merged_nodes))]
+    pid_edges.sort(key=lambda x: x[2]) 
+    pid_edges.sort(key=lambda x: x[4]) # this way we have all edges on a trip sequentially according to depart time
+    last_tid = -1
+    tid_amount = 0
+    for i in range(len(pid_edges)):
+        trip_tid = pid_edges[i][4]
+        if trip_tid != last_tid:
+            for j in range(i - tid_amount, i):
+                for k in range(j, i):
+                    root = pid_edges[j][0]
+                    goal = pid_edges[k][1]
+                    travel_time = pid_edges[k][2] - pid_edges[j][2] + pid_edges[k][3]
+                    if goal not in neigh_list_dict[root]:
+                        neigh_list_dict[root][goal] = {}
+                    if travel_time not in neigh_list_dict[root][goal]:
+                        neigh_list_dict[root][goal][travel_time] = H.EdgeSet(root, goal, travel_time)
+                    neigh_list_dict[root][goal][travel_time].addEdge(pid_edges[j][2], pid_edges[j][4], pid_edges[j][5])
+            tid_amount = 0
+        last_tid = trip_tid
+        tid_amount += 1
+
+    # Add edge sets from neigh dict list to neigh list
+    for root in range(len(merged_nodes)):
+        for goal in neigh_list_dict[root]:
+            for travel_time in neigh_list_dict[root][goal]:
+                neigh_list_dict[root][goal][travel_time].sortEdges()
+                edge_set = neigh_list_dict[root][goal][travel_time]
+                neigh_list[root].append(edge_set)
+                edge_set_amount += 1
+
+    # Save to text file for c++ program to load - possible upgrade: save to json, should be fast enough regardless...
+    # FORMAT: 
+    # - First line: edge set amount - n; n edge sets follow...
+    # - Edge set: edge amount - m, root, goal, travel time; m edges follow... 
+    # - Edge: depart time, trip id, route id -> -1 if not applicaple(walk edges) 
+    #   - edges sorted by depart time in ascending order
 
     print("done.")
     return final_nodes, neigh_list
