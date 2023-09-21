@@ -275,13 +275,6 @@ def createMergedGraph(walk_nodes, walk_edges, pid_nodes, pid_edges, transfer_edg
                 neigh_list[root].append(edge_set)
                 edge_set_amount += 1
 
-    # Save to text file for c++ program to load - possible upgrade: save to json, should be fast enough regardless...
-    # FORMAT: 
-    # - First line: edge set amount - n; n edge sets follow...
-    # - Edge set: edge amount - m, root, goal, travel time; m edges follow... 
-    # - Edge: depart time, trip id, route id -> -1 if not applicaple(walk edges) 
-    #   - edges sorted by depart time in ascending order
-
     print("done.")
     return final_nodes, neigh_list
 
@@ -299,6 +292,15 @@ def saveMergedGraph(walk_node_amount, final_nodes, neigh_list):
     relative_path = (impresources.files(graphs) / "walk_node_amount.obj")
     with open(relative_path, "wb") as f:
         pickle.dump(walk_node_amount, f)
+
+    # Save to text file for c++ program to load - possible upgrade: save to json, should be fast enough regardless...
+    # FORMAT: 
+    # - First line: edge set amount - n; n edge sets follow...
+    # - Edge set: edge amount - m, root, goal, travel time; m edges follow... 
+    # - Edge: depart time, trip id, route id -> -1 if not applicaple(walk edges) 
+    #   - edges sorted by depart time in ascending order
+
+    
     print("done.")
     
 

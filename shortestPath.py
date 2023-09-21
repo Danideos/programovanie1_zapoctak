@@ -56,32 +56,34 @@ def Dijkstra(nodes, nox, start, end, time, translator):
     depart = [[]] * len(nodes)
     previous = [-1] * len(nodes)
     distance = [1e9] * len(nodes)
-    penalized_distance = [1e9] * len(nodes)
+    penalization = [0] * len(nodes)
 
     distance[start] = time
-    priority_queue = [(time, start, 0)]
+    priority_queue = [(time, start)]
     while priority_queue:
-        cur_penalized_distance, node, transfer_amount = heapq.heappop(priority_queue)
+        penalized_distance, node = heapq.heappop(priority_queue)
         if node == end:
             return previous, distance, trip_type, depart
         for edge_set in nox[node]:
+            # Find whether the edge is usable
             depart_time, route_id = edge_set.getEdge(distance[node], translator)
             if depart_time != False:
+                # Calculate time distance 
                 distance_to_neighbor = depart_time + edge_set.travel_time
-                penalty = transfer_amount * H.transfer_penalty
+                # Calculate transfer penalty
+                penalty = penalization[edge_set.root]
                 if route_id != -1:
                     penalty += H.transfer_penalty
+                # Check if new minimal penalized distance found
                 if distance_to_neighbor + penalty < distance[edge_set.goal]:
                     trip_type[edge_set.goal].append([route_id, edge_set.root, edge_set.goal])
                     depart[edge_set.root].append([depart_time, edge_set.root, edge_set.goal])
                     previous[edge_set.goal] = edge_set.root
                     distance[edge_set.goal] = distance_to_neighbor
-                    penalized_distance[edge_set.goal] = distance_to_neighbor + penalty
-                    if route_id != -1:
-                        heapq.heappush(priority_queue, (penalized_distance[edge_set.goal], edge_set.goal, transfer_amount + 1))
-                    else:
-                        heapq.heappush(priority_queue, (penalized_distance[edge_set.goal], edge_set.goal, transfer_amount))
-    return False
+                    penalization[edge_set.goal] = penalty
+                    heapq.heappush(priority_queue, (penalization[edge_set.goal]+distance[edge_set.goal], edge_set.goal))
+                   
+    return False, False, False, False
 
 def chooseNodeColor(last_node_id, cur_node_id, walk_node_amount):
     if last_node_id < walk_node_amount and cur_node_id < walk_node_amount:
@@ -98,7 +100,7 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
     while res[path[-1]] != -1:
         path.append(res[path[-1]])
     path.reverse()
-    
+
     mapbox_access_token = "pk.eyJ1IjoiZGFuaWRlb3MiLCJhIjoiY2w5cTJxNnMxMDVhZjNwbDcxdng5cW84NyJ9.k2kz26pJ1gk4NSdc0N0HHQ"
     fig = go.Figure()
     
@@ -118,15 +120,19 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
     last_lon, last_lat = nodes[path[0]].lon, nodes[path[0]].lat
     color = chooseNodeColor(path[0], path[1], walk_node_amount)
     timestamp = datetime.timedelta(seconds=dist[path[0]])
-    # route_id = trip_type[path[0]] if trip_type[path[0]] != -1 else "walk"
     route_id = findTripType(path[0], path[1], trip_type[0])
     depart_time = findDepartTime(path[0], path[1], depart[path[0]])
+    if route_id != -1:
+        text = f"Timestamp: {timestamp}, Depart time: {depart_time}, Route id: {route_id}"
+    else:
+        text = f"Timestamp: {timestamp}, Depart time: {depart_time}"
+
     fig.add_trace(go.Scattermapbox(
         mode='markers',
         opacity=1,
         lon=[last_lon],
         lat=[last_lat],
-        text=f"Timestamp: {timestamp}, Route id: {route_id}, Depart time: {depart_time}",
+        text=text,
         marker={'size': 16,
                 'color': color}
     ))
@@ -138,12 +144,17 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
         timestamp = datetime.timedelta(seconds=dist[path[i - 1]])
         route_id = findTripType(path[i - 1], path[i], trip_type[i - 1])
         depart_time = findDepartTime(path[i - 1], path[i], depart[path[i - 1]])
+        if route_id != -1:
+            text = f"Timestamp: {timestamp}, Depart time: {depart_time}, Route id: {route_id}"
+        else:
+            text = f"Timestamp: {timestamp}, Depart time: {depart_time}"
+
         fig.add_trace(go.Scattermapbox(
             mode='markers+lines',
             opacity=1,
             lon=[last_lon, lon],
             lat=[last_lat, lat],
-            text=f"Timestamp: {timestamp}, Route id: {route_id}, Depart time: {depart_time}",
+            text=text,
             marker={'size': 8,
                     'color': color}
             
@@ -182,7 +193,7 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
     
 if __name__ == "__main__":
     stime = time.time()
-    date = 20230919
+    date = 20230921
     start_time = 3600*15+4*60
 
     trip_to_service, service_schedule, service_exception = openTripSchedules()
@@ -192,15 +203,13 @@ if __name__ == "__main__":
     stime = time.time()
     nodes, neigh_list, walk_node_amount = openGraph()
     print(f"Graph load length: {time.time() - stime:.3f} sec")
-
+    
     stime = time.time()
     start = 150000
     goal = 0
-    
+    print(nodes[start].lat, nodes[start].lon, nodes[goal].lat, nodes[goal].lon)
     res, dists, trip_type, depart = Dijkstra(nodes, neigh_list, start, goal, start_time, translator)
-    path = showPath(nodes, dists, res, trip_type, depart, goal, walk_node_amount)
+    showPath(nodes, dists, res, trip_type, depart, goal, walk_node_amount)
     print(f"Algo length: {time.time() - stime:.3f} sec")
     print(f"Parametres: start_time={datetime.timedelta(seconds=start_time)}, date={datetime.datetime.strptime(str(date), '%Y%m%d').date()}, start node id={start}, goal node id={goal}")
     print(f"Travel time total: {datetime.timedelta(seconds=dists[goal] - start_time)}")
-
-    

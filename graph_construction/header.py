@@ -12,8 +12,8 @@ place_name = "Prague"
 k_precision = 10 # How many k-closest nodes to consider when creating transfer edges
 url = "https://data.pid.cz/PID_GTFS.zip"
 save_path = "PID_GTFS.zip"
-min_transfer_time = 0
-transfer_penalty = 160
+min_transfer_time = 180
+transfer_penalty = 300
 
 # Classes
 class Node:
