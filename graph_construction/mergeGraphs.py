@@ -219,8 +219,8 @@ def createMergedGraph(walk_nodes, walk_edges, pid_nodes, pid_edges, transfer_edg
     # Create final node representation
     final_nodes = []
     for i in range(len(merged_nodes)):
-        node_id, node_lon, node_lat = merged_nodes[i]
-        node = H.Node(node_id, node_lon, node_lat)
+        node_id, node_lon, node_lat, node_name = merged_nodes[i]
+        node = H.Node(node_id, node_lon, node_lat, node_name)
         final_nodes.append(node)
 
     # Create final neighbor list representation with edge sets. 

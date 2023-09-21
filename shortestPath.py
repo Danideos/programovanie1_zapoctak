@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 import heapq
 import datetime
 import pickle
-import time
     
 def openGraph():
     relative_path = (impresources.files(graphs) / "final_nodes.obj")
@@ -122,10 +121,12 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
     timestamp = datetime.timedelta(seconds=dist[path[0]])
     route_id = findTripType(path[0], path[1], trip_type[0])
     depart_time = findDepartTime(path[0], path[1], depart[path[0]])
+    node_name = nodes[path[0]].name
+    text = f"Timestamp: {timestamp}"
     if route_id != -1:
-        text = f"Timestamp: {timestamp}, Depart time: {depart_time}, Route id: {route_id}"
-    else:
-        text = f"Timestamp: {timestamp}, Depart time: {depart_time}"
+        text += f", Depart time: {depart_time}, Route id: {route_id}"
+    if node_name != "NA":
+        text += f", Stop name: {node_name}"
 
     fig.add_trace(go.Scattermapbox(
         mode='markers',
@@ -144,10 +145,12 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
         timestamp = datetime.timedelta(seconds=dist[path[i - 1]])
         route_id = findTripType(path[i - 1], path[i], trip_type[i - 1])
         depart_time = findDepartTime(path[i - 1], path[i], depart[path[i - 1]])
+        node_name = nodes[path[i - 1]].name
+        text = f"Timestamp: {timestamp}"
         if route_id != -1:
-            text = f"Timestamp: {timestamp}, Depart time: {depart_time}, Route id: {route_id}"
-        else:
-            text = f"Timestamp: {timestamp}, Depart time: {depart_time}"
+            text += f", Depart time: {depart_time}, Route id: {route_id}"
+        if node_name != "NA":
+            text += f", Stop name: {node_name}"
 
         fig.add_trace(go.Scattermapbox(
             mode='markers+lines',
@@ -163,12 +166,17 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
 
     # Add the goal node
     timestamp = datetime.timedelta(seconds=dist[path[-1]])
+    node_name = nodes[path[-1]].name
+    if node_name != "NA":
+        text = f"Timestamp: {timestamp}, Stop name: {node_name}"
+    else:
+        text = f"Timestamp: {timestamp}"
     fig.add_trace(go.Scattermapbox(
         mode='markers',
         opacity=1,
         lon=[last_lon],
         lat=[last_lat],
-        text=f"Timestamp: {timestamp}",
+        text=text,
         marker={'size': 16,
                 'color': color}
     ))
@@ -191,25 +199,3 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
     fig.show()
 
     
-if __name__ == "__main__":
-    stime = time.time()
-    date = 20230921
-    start_time = 3600*15+4*60
-
-    trip_to_service, service_schedule, service_exception = openTripSchedules()
-    translator = H.Translator(trip_to_service, service_schedule, service_exception, date)
-    print(f"Translator load length: {time.time() - stime:.3f} sec")
-    
-    stime = time.time()
-    nodes, neigh_list, walk_node_amount = openGraph()
-    print(f"Graph load length: {time.time() - stime:.3f} sec")
-    
-    stime = time.time()
-    start = 150000
-    goal = 0
-    print(nodes[start].lat, nodes[start].lon, nodes[goal].lat, nodes[goal].lon)
-    res, dists, trip_type, depart = Dijkstra(nodes, neigh_list, start, goal, start_time, translator)
-    showPath(nodes, dists, res, trip_type, depart, goal, walk_node_amount)
-    print(f"Algo length: {time.time() - stime:.3f} sec")
-    print(f"Parametres: start_time={datetime.timedelta(seconds=start_time)}, date={datetime.datetime.strptime(str(date), '%Y%m%d').date()}, start node id={start}, goal node id={goal}")
-    print(f"Travel time total: {datetime.timedelta(seconds=dists[goal] - start_time)}")

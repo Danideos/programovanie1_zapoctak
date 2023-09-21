@@ -8,19 +8,20 @@ import datetime
 # Constants
 radius = 6378 # Earth radius in km
 walking_speed = 4.5 # Walking speed in kmph
-place_name = "Prague"
+place_name = "Prague" 
 k_precision = 10 # How many k-closest nodes to consider when creating transfer edges
-url = "https://data.pid.cz/PID_GTFS.zip"
-save_path = "PID_GTFS.zip"
-min_transfer_time = 180
-transfer_penalty = 300
+url = "https://data.pid.cz/PID_GTFS.zip" # url for PID_GTFS.zip download 
+save_path = "PID_GTFS.zip" # Save name for the PID_GTFS.zip file
+min_transfer_time = 180 # Minimal time in sec for using a pid line after getting to a pid node
+transfer_penalty = 0 # Penalization in sec for using a pid line
 
 # Classes
 class Node:
-    def __init__(self, node_id, lon, lat):
+    def __init__(self, node_id, lon, lat, name):
         self.id = node_id
         self.lon = lon
         self.lat = lat
+        self.name = name
 
 
 class EdgeSet:
@@ -126,10 +127,11 @@ def normalize(v):
        return v
     return v / norm
 
-def showTransferEdge(plat, plon, walk_nodes, te, te2):
-    n1id, n2id = te[1], te2[1]
-    lon1, lat1 = walk_nodes[n1id][1], walk_nodes[n1id][2]
-    lon2, lat2 = walk_nodes[n2id][1], walk_nodes[n2id][2]
+def showTransferEdge(pid_lat, pid_lon, walk_nodes, transfer_edge1, transfer_edge2):
+    # Only a debugging tool 
+    node1_id, node2_id = transfer_edge1[1], transfer_edge2[1]
+    lon1, lat1 = walk_nodes[node1_id][1], walk_nodes[node1_id][2]
+    lon2, lat2 = walk_nodes[node2_id][1], walk_nodes[node2_id][2]
     mapbox_access_token = "pk.eyJ1IjoiZGFuaWRlb3MiLCJhIjoiY2w5cTJxNnMxMDVhZjNwbDcxdng5cW84NyJ9.k2kz26pJ1gk4NSdc0N0HHQ"
     fig = go.Figure()
     fig.add_trace(go.Scattermapbox(
@@ -144,8 +146,8 @@ def showTransferEdge(plat, plon, walk_nodes, te, te2):
     fig.add_trace(go.Scattermapbox(
                                 mode='markers',
                                 opacity=1,
-                                lon=[plon],
-                                lat=[plat],
+                                lon=[pid_lon],
+                                lat=[pid_lat],
                                
                                 marker={'size': 8,
                                         'color': "blue"}
@@ -159,8 +161,8 @@ def showTransferEdge(plat, plon, walk_nodes, te, te2):
             accesstoken=mapbox_access_token,
             bearing=0,
             center=dict(
-                lat=plat,
-                lon=plon
+                lat=pid_lat,
+                lon=pid_lon
             ),
             pitch=0,
             zoom=15

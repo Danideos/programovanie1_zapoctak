@@ -8,6 +8,25 @@ import warnings
 import numpy as np
 import time as tm
 
+def handleInput():
+    with open("input.txt", "r", encoding="utf-8") as f:
+        line = [str(i) for i in f.readline().split()]
+        dest_count, date, time = handleFirstLine(line)
+        places = []
+        # Start node
+        line = [str(i) for i in f.readline().split()]
+        places.append([handleCoorLine(line), 0])
+        for _ in range(dest_count - 2):
+            # Inbetween nodes
+            line = [str(i) for i in f.readline().split()]
+            place = handleCoorLine(line)
+            line = [str(i) for i in f.readline().split()]
+            stay_time = handleStayTimeLine(line)
+            places.append([place, stay_time])
+        # End node
+        line = [str(i) for i in f.readline().split()]
+        places.append([handleCoorLine(line), 0])
+    return places, date, time
 
 def handleFirstLine(line):
     if len(line) != 3:
@@ -49,26 +68,6 @@ def handleStayTimeLine(line):
         raise ValueError("Incorrect stay_time format, should be hh:mm:ss")
     return stay_time
 
-def handleInput():
-    with open("input.txt", "r", encoding="utf-8") as f:
-        line = [str(i) for i in f.readline().split()]
-        dest_count, date, time = handleFirstLine(line)
-        places = []
-        # Start node
-        line = [str(i) for i in f.readline().split()]
-        places.append([handleCoorLine(line), 0])
-        for _ in range(dest_count - 2):
-            # Inbetween nodes
-            line = [str(i) for i in f.readline().split()]
-            place = handleCoorLine(line)
-            line = [str(i) for i in f.readline().split()]
-            stay_time = handleStayTimeLine(line)
-            places.append([place, stay_time])
-        # End node
-        line = [str(i) for i in f.readline().split()]
-        places.append([handleCoorLine(line), 0])
-    return places, date, time
-
 def findClosestNode(node, ball_tree):
     dists, indices = ball_tree.query([[np.deg2rad(node[0]), np.deg2rad(node[1])]], k=1)
     return indices[0][0]
@@ -105,7 +104,6 @@ def findPaths(places, date, time):
 
 if __name__ == "__main__":
     places, date, time = handleInput()
-
     findPaths(places, date, time)
     
     

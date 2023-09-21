@@ -14,7 +14,7 @@ def extractOxNodes(ox_graph):
     graph_nodes = []
     for node_id in ox_graph.nodes:
         formatted_node = [
-            node_id, ox_graph.nodes[node_id]["x"], ox_graph.nodes[node_id]["y"]
+            node_id, ox_graph.nodes[node_id]["x"], ox_graph.nodes[node_id]["y"], "NA"
         ]
         graph_nodes.append(formatted_node)
     print("done.")

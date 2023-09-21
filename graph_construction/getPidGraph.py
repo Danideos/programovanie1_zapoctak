@@ -12,13 +12,13 @@ def ExtractPidNodes():
         f.readline() # Get rid of the first format line
         for line in f.readlines():
             """
-            Node format: [ node ID, node longitude, node latitude ] 
+            Node format: [ node ID, node longitude, node latitude, node_name ] 
             """
-            formatted_node = [0, 0, 0] # Placeholder values
+            formatted_node = [0, 0, 0, ""] # Placeholder values
             node_field = ""
             in_quotes = False
             comma_count = 0
-            # Parsing chars because of problems with "stop_name" (field 2) -> can be omitted or contain commas...
+            # Parsing chars because of problems with "stop_name" (field 2) -> can be omitted or CONTAIN COMMAS...
             for char in line:
                 if char == '"':
                     in_quotes = not in_quotes
@@ -29,13 +29,14 @@ def ExtractPidNodes():
                         formatted_node[1] = float(node_field.strip())
                     elif comma_count == 2:
                         formatted_node[2] = float(node_field.strip())
-                    elif comma_count > 3:
+                    elif comma_count == 1:
+                        formatted_node[3] = node_field
+                    else:
                         break
                     node_field = ""
                     comma_count += 1
                 else:
                     node_field += char
-
             graph_nodes.append(formatted_node)
     print("done.")
     return graph_nodes
