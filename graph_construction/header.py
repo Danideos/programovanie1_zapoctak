@@ -14,6 +14,7 @@ url = "https://data.pid.cz/PID_GTFS.zip" # url for PID_GTFS.zip download
 save_path = "PID_GTFS.zip" # Save name for the PID_GTFS.zip file
 min_transfer_time = 180 # Minimal time in sec for using a pid line after getting to a pid node
 transfer_penalty = 0 # Penalization in sec for using a pid line
+mapbox_access_token = "pk.eyJ1IjoiZGFuaWRlb3MiLCJhIjoiY2w5cTJxNnMxMDVhZjNwbDcxdng5cW84NyJ9.k2kz26pJ1gk4NSdc0N0HHQ"
 
 # Classes
 class Node:
@@ -132,7 +133,7 @@ def showTransferEdge(pid_lat, pid_lon, walk_nodes, transfer_edge1, transfer_edge
     node1_id, node2_id = transfer_edge1[1], transfer_edge2[1]
     lon1, lat1 = walk_nodes[node1_id][1], walk_nodes[node1_id][2]
     lon2, lat2 = walk_nodes[node2_id][1], walk_nodes[node2_id][2]
-    mapbox_access_token = "pk.eyJ1IjoiZGFuaWRlb3MiLCJhIjoiY2w5cTJxNnMxMDVhZjNwbDcxdng5cW84NyJ9.k2kz26pJ1gk4NSdc0N0HHQ"
+    
     fig = go.Figure()
     fig.add_trace(go.Scattermapbox(
                                 mode='markers+lines',

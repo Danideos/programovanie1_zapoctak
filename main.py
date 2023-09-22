@@ -53,7 +53,9 @@ def handleCoorLine(line):
     for coor in line:
         try:
             a, b = [str(i) for i in coor.split(".")]
-            if len(a) != 2 and len(b) != 7:
+            print(a, len(a), b, len(b))
+
+            if len(a) != 2 or len(b) != 7:
                 raise ValueError("Incorrect latitude and longitude format, should be XX.XXXXXXX, YY.YYYYYYY")
             processed_coor = float(a + "." + b)
             place.append(processed_coor)

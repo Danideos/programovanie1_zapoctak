@@ -100,7 +100,6 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
         path.append(res[path[-1]])
     path.reverse()
 
-    mapbox_access_token = "pk.eyJ1IjoiZGFuaWRlb3MiLCJhIjoiY2w5cTJxNnMxMDVhZjNwbDcxdng5cW84NyJ9.k2kz26pJ1gk4NSdc0N0HHQ"
     fig = go.Figure()
     
     def findDepartTime(root, goal, depart_list):
@@ -186,7 +185,7 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
         hovermode='closest',
         margin=dict(l=75, r=75, t=25, b=25),
         mapbox=dict(
-            accesstoken=mapbox_access_token,
+            accesstoken=H.mapbox_access_token,
             bearing=0,
             center=dict(
                 lat=last_lat,
