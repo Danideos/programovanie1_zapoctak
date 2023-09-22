@@ -5,7 +5,8 @@ Find the shortest path from point A to B to ... to X on the city of Prague, with
 # User documentation
 
 1. **Preparation:**
-   - For the project to be usable `programming1_zapoctak>python prepare.py` needs to be run on the command line. It creates the searched graph according to public data available for the current date. It takes around 3 minutes to complete all the preparation steps. 
+   - For the project to be usable `programming1_zapoctak>python prepare.py` needs to be run on the command line. It creates the searched graph according to public data available for the current date. It takes around 3 minutes to complete all the preparation steps.
+   - A valid `mapbox_access_token` needed to be put into `mapbox_access_token.txt`. The service used is [https://account.mapbox.com/](https://account.mapbox.com/), which is free when not used extensively(over 50 000 uses a month), but requires credit card credentials - I can provide my own token for testing purposes. 
      
 2. **User input:**
    - `input.txt` is used for user input. Format: first line has 3 space separated values, `n` for the amount of places to visit on the path, `date`(yyyy.mm.dd) and `time`(hh:mm:ss) as start condition parametres. The subsequent lines contain `latitude` and `longitude`(XX.XXXXXXX - 7 decimals) of places to visit, each place besides the first and last is followed by a line, which contains how long to stay in this place(hh:mm:ss).
@@ -20,7 +21,12 @@ example input:
 ```
 
 3. **Running the project:**
-   - run `programming_zapoctak1>python main.py` on the command line to find the shortest paths for the given input. Takes around 20 seconds to load the grapg and 3 secons to find path from one place to another.
+   - run `programming_zapoctak1>python main.py` on the command line to find the shortest paths for the given input. Takes around 20 seconds to load the graph and 3 secons to find path from one place to another. Every path from one place to another will open in browser, where the path can be inspected.
+   - Hovering on a node will show information about the node and subsequent edge: `timestamp`, `departure_time`, `route_id`, `stop_name` if applicable.
+   - Red lines represent a pid line, blue lines a walk edge and green lines transfer edges between pid nodes and walk nodes. 
+
+example output:
+![shown_path_example](https://github.com/Danideos/programovanie1_zapoctak/assets/34748918/9d78a45a-8982-49eb-b9ea-edf4ad558fb3)
    
 # Programming documentation
 
@@ -136,5 +142,3 @@ A classical Dijsktra with addition of two elements:
 ### showPath()
 
 Responsible for plotting the found shortest path from point A to B using `plotly.graph_objects`. 
-
-A valid `mapbox_access_token` needed, set in `header.py`. The service I use is from [https://account.mapbox.com/](https://account.mapbox.com/), which is free to use when not used extensively, but requires credit card credentials - I will provide my own token for testing purposes. 
