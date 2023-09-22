@@ -113,4 +113,4 @@ A classical Dijsktra with addition of two elements:
 
 Responsible for plotting the found shortest path from point A to B using `plotly.graph_objects`. 
 
-A valid `mapbox_access_token` needed, set in `header.py`. The service I use is from [https://account.mapbox.com/](https://account.mapbox.com/), which is free to use when not used extensively, but requires credit card credentials, so I provide my own token. 
+A valid `mapbox_access_token` needed, set in `header.py`. The service I use is from [https://account.mapbox.com/](https://account.mapbox.com/), which is free to use when not used extensively, but requires credit card credentials - I will provide my own token for testing purposes. 
