@@ -179,13 +179,16 @@ def showPath(nodes, dist, res, trip_type, depart, goal, walk_node_amount):
         marker={'size': 16,
                 'color': color}
     ))
+
+    with open("mapbox_access_token.txt", "r", encoding="utf+8") as f:
+        mapbox_access_token = f.readline()
     
     fig.update_layout(
         autosize=True,
         hovermode='closest',
         margin=dict(l=75, r=75, t=25, b=25),
         mapbox=dict(
-            accesstoken=H.mapbox_access_token,
+            accesstoken=mapbox_access_token,
             bearing=0,
             center=dict(
                 lat=last_lat,
