@@ -54,10 +54,10 @@ Performs preparation steps neccessary for the project:
    - Find transfer edges between graphs by connecting each PID node to the nearest walk edge.
 
 6. **Trip Schedule Extraction:**
-   - Extract and save trip schedules, indicating whether a trip commences on a particular date.
+   - Extract and save trip schedules to `graph_construction/trip_schedules` folder, indicating whether a trip commences on a particular date.
 
 7. **Merge graphs:**
-   - Merge the PID and walk graphs into a final data structure.
+   - Merge the PID and walk graphs into a final data structure and save to `graph_construction/graphs` folder.
    - This merged data structure will be used to efficiently find the shortest path for your application.
 
 ---
