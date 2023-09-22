@@ -1,7 +1,7 @@
 # User documentation
 
 1. **Preparation:**
-   - For the project to be usable `programming1_zapoctak>python prepare.py` needs to be run on the command line. It creates the searched graph according to public date available for the current date.
+   - For the project to be usable `programming1_zapoctak>python prepare.py` needs to be run on the command line. It creates the searched graph according to public data available for the current date.
      
 2. **User input:**
    - `input.txt` is used for user input. Format: first line has 3 space separated values, `n` for the amount of places to visit on the path, `date`(yyyy.mm.dd) and `time`(hh:mm:ss) as start condition parametres. The subsequent lines contain `latitude` and `longitude`(XX.XXXXXXX - 7 decimals) of places to visit, each place besides the first and last is followed by a line, which contains how long to stay in this place(hh:mm:ss).
