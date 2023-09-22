@@ -39,7 +39,7 @@ Extract the pid graph(as nodes and edges) from the `pid_data` folder. More speci
 
 Node format: `[ node_ID, node_longitude, node_latitude, node_name ]`
 
-Edge format: `[ node1_ID, node2_ID, departure_time, travel_time,  trip_id ]` 
+Edge format: `[ node1_ID, node2_ID, departure_time, travel_time, trip_id ]` 
 
 ---
 
@@ -65,41 +65,52 @@ __Discussion about alternative approaches:__ I also considered just adding trans
 
 ### getTripSchedules()
 
-Each `trip_id` has a `service_id`, which corresponds to a schedule(whether a trip commences on a particular day in the week). Schedule has exceptions. Create a suitable data structure to access this information from `trips.txt`, `caledar.txt`, `calendar_dates.txt`. 
+Each `trip_id` has a `service_id`, which corresponds to a schedule(whether a trip commences on a particular day of the week). Schedule has exceptions. Create a suitable data structure to access this information from `trips.txt`, `caledar.txt`, `calendar_dates.txt` and save it.
 
-__TODO:__ `service_id` exceptions not handled yet
+__TODO:__ `service_id` exceptions not handled yet.
 
 ### createMergedGraph()
+Create the final graph representation, the `final_nodes` and `neighbor_list`.
 
-There are many pid edges, which start and end in the same pid nodes. To optimize create `edge_set`, which will be defined by the same start and end nodes. In the set the edges will be distinguished by: `departure_time` and `trip id`, they will be sorted by `departure_time` to allow binary search. 
-
-Additionaly, create new edges, which will include every reachable station on a trip, e.g. create edge from node 1 to node 2,3,4... on a trip and from node 2 to 3,4,5... and so on.
+There are many pid edges, which start and end in the same pid nodes. To optimize create `edge_set` for similiar trips - more in `graphHeader.py` section. Additionaly, create new edges, which will include every reachable station on a trip, e.g. create an edge from node 1 to node 2,3,4... on a trip and from node 2 to 3,4,5... and so on.
 
 ### saveMergedGraph()
-use `pickle` to `pickle.dump` the whole merged graph data structure for faster load time. Concretely the `nodes` and the `neighbour_list`.
+Use `pickle` to `pickle.dump()` the whole merged graph data structure for faster load time. Concretely the `nodes` and the `neighbour_list`.
 
 ---
 
 ### graphHeader.py
 
-A simple encapsulation for commonly used functions to not clutter the main code.
+A simple encapsulation for commonly used functions and constants to not clutter the main code. `minimal_transfer_time` and `transfer_penalty` are set here.
 
+### class Edge_Set()
 
+Edge data structure defined by the same `root`, `goal` and `travel_time`. 
+
+Individual edges in the `edge_set` have `departure_time` and `trip_id` and are sorted by the `departure_time` - this way binary search can be used to find the soonest departure in `getEdge(time)`.
+
+### class Translator()
+
+Return whether `service_id` corresponding to `trip_id` commences on a particular `date`. 
+
+__TODO:__ `service_id` exceptions not handled yet.
 
 ---
 
+## Shortest path algorithm
 
+### shortestPath.py
 
-# Finding the shortest path
+Script responsible for loading the prepared graph, finding and plotting the shortest path. 
 
-## main.py
+### Dijkstra()
 
-Responsible for taking user input, starting the shortestPath.py and plotting the found path. 
+A classical Dijsktra with addition of two elements: 
+- `minimal_transfer_time`: wait time to transfer to a pid line after getting to a pid node - to discourage immediate transfers and missing a transfer as a result
+- `transfer_penalty`: every pid line taken will be penalized by a constant amount - a path with less transfers might be desirable to a bit faster one
 
-## shortestPath.py
+### showPath()
 
-Load the graph from graphs/merged_graph.txt as a neighbor list. Load the trip id operational timetable from calendars.txt and calendar_dates.txt to list(trip ids are index-able thanks to transformation in mergeGraphs.py).  
+Responsible for plotting the found shortest path from point A to B using `plotly.graph_objects`. 
 
-
-
-For the actual algorithm: A classic Dijkstra with a twist. When looking at neighbors of the current closest unvisited node, we must consider the whole edge set between the two nodes. For this there will be a simple function, which will return an edge from the set, which arrives at the end node first. This function will be logarithmic with regard to the set size(binary search on departure times that will be sorted in the set - assuming the travel times are the same). It will take current time (start time + dist) as a parameter and return edge with the closest bigger departure time, which has trip id that is currently operational(calendars.txt and calendar_dates.txt).
+A valid `mapbox_access_token` needed, set in `header.py`. The service I use is from [https://account.mapbox.com/](https://account.mapbox.com/), which is free to use when not used extensively, but requires credit card credentials, so I provide my own token. 
