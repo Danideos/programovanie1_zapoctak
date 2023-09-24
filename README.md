@@ -12,7 +12,7 @@ This project is developed as my semestral project for *Programming I* course on 
    - For the project to be usable `programming1_zapoctak>python prepare.py` needs to be run on the command line. It creates the searched graph according to public data available for the current date. It takes around 3 minutes to complete all the preparation steps.
      
 2. **User input:**
-   - `input.txt` is used for user input. Format: first line has 3 space separated values, `n` for the amount of places to visit on the path, `date`(yyyy.mm.dd) and `time`(hh:mm:ss) as start condition parametres. The subsequent lines contain `latitude` and `longitude`(XX.XXXXXXX - 7 decimals) of places to visit, each place besides the first and last is followed by a line, which contains how long to stay in this place(hh:mm:ss).
+   - `input.txt` is used for user input. Format: first line has 3 space separated values, `n` for the amount of places to visit on the path, `date`(yyyy.mm.dd - should be within a week of current date) and `time`(hh:mm:ss) as start condition parametres. The subsequent lines contain `latitude` and `longitude`(XX.XXXXXXX - 7 decimals) of places to visit, each place besides the first and last is followed by a line, which contains how long to stay in this place(hh:mm:ss).
    - Additionaly, `transfer_penalty` and `min_transfer_time` arguments can be set in `graphHeader.py`, more about them in `shortestPath.py` section. 
  
 example input:
