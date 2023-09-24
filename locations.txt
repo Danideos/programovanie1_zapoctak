@@ -1,0 +1,6 @@
+Pelc Tyrolka, Students dormitory, Troja: 50.1165430 14.4423620
+Charles University Sports Center, Hostivař: 50.0517740 14.5465580
+Charles University Faculty of Mathematics and Physics, Malá Strana: 50.0882990 14.4038250
+The Main Train Station of Prague: 50.0832120 14.4353140
+Prague Zoo: 50.1177260 14.4061970
+Prague Kbely Airport: 50.1235440 14.5413620

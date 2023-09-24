@@ -2,10 +2,20 @@
 from graph_construction import getPidGraph, getWalkGraph, header as H, mergeGraphs
 import getPidData
 
+def tokenCheck():
+    with open("mapbox_access_token.txt", "r", encoding="utf-8") as f:
+        token = f.readline().strip()
+        if token == "":
+            raise ValueError("Mapbox token not provided")
+        
+
 if __name__ == "__main__":
     # Download necessary PID data 
     getPidData.downloadFile(H.url, H.save_path)
     getPidData.extractFromFile(H.save_path)
+
+    # Check for mapbox access token 
+    tokenCheck()
 
     # Construct PID graph from the PID data
     pid_nodes = getPidGraph.ExtractPidNodes()

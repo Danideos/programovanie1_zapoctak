@@ -90,18 +90,16 @@ def findPaths(places, date, time):
         if start == goal:
             warnings.warn(f"Destination {i} and {i + 1} are registered as the same node, skipping...")
         if i != 0:
-            start_time = dist[goal] + places[i][1]
+            start_time = dist[start] + places[i][1]
             if start_time >= 24*3600:
                 warnings.warn("Inaccurate result warning, time passing midnight is not yet handled...")
-
+        print(f"Parametres: start_time={datetime.timedelta(seconds=start_time)}, wait_time={datetime.timedelta(seconds=places[i][1])}, date={datetime.datetime.strptime(str(date), '%Y%m%d').date()}, start node id={start}, goal node id={goal}")
         prev, dist, trip_type, depart = shortestPath.Dijkstra(nodes, neigh_list, start, goal, start_time, translator)
         if prev == False:
             raise ValueError("Something went wrong in the Dijkstra algo...")
         shortestPath.showPath(nodes, dist, prev, trip_type, depart, goal, walk_node_amount)
         print(f"Algo length: {tm.time() - stime:.3f} sec")
-        print(f"Parametres: start_time={datetime.timedelta(seconds=start_time)}, date={datetime.datetime.strptime(str(date), '%Y%m%d').date()}, start node id={start}, goal node id={goal}")
         print(f"Travel time delta: {datetime.timedelta(seconds=dist[goal] - start_time)}")
-
 
 if __name__ == "__main__":
     places, date, time = handleInput()
