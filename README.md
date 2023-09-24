@@ -13,7 +13,6 @@ This project is developed as my semestral project for *Programming I* course on 
      
 2. **User input:**
    - `input.txt` is used for user input. Format: first line has 3 space separated values, `n` for the amount of places to visit on the path, `date`(yyyy.mm.dd) and `time`(hh:mm:ss) as start condition parametres. The subsequent lines contain `latitude` and `longitude`(XX.XXXXXXX - 7 decimals) of places to visit, each place besides the first and last is followed by a line, which contains how long to stay in this place(hh:mm:ss).
-   - Hovering on a node will show information about the node and subsequent edge: `timestamp`, `departure_time`, `route_id`, `stop_name` if applicable. Red lines represent a pid line, blue lines a walk edge and green lines transfer edges between pid nodes and walk nodes. 
    - Additionaly, `transfer_penalty` and `min_transfer_time` arguments can be set in `graphHeader.py`, more about them in `shortestPath.py` section. 
  
 example input:
@@ -27,13 +26,14 @@ example input:
    - For the convenience there are a few locations available in locations.txt
 
 3. **Running the project:**
-   - run `programming_zapoctak1>python main.py` on the command line to find the shortest paths for the given input. Takes around 20 seconds to load the graph and 4 seconds to find a path from one place to another.
+   - run `programming_zapoctak1>python main.py` on the command line to find the shortest paths for the given input. Takes around 20 seconds to load the graph and 3 secons to find path from one place to another. Every path from one place to another will open in browser, where the path can be inspected.
+   - Hovering on a node will show information about the node and subsequent edge: `timestamp`, `departure_time`, `route_id`, `stop_name` if applicable.
+   - Red lines represent a pid line, blue lines a walk edge and green lines transfer edges between pid nodes and walk nodes. 
 
-   example output:
+example output:
 
 ![shown_path_example](https://github.com/Danideos/programovanie1_zapoctak/assets/34748918/9d78a45a-8982-49eb-b9ea-edf4ad558fb3)
-    
-
+   
 # Programming documentation
 
 ## High level overview of preparation steps 
@@ -60,10 +60,10 @@ Performs preparation steps neccessary for the project:
    - Find transfer edges between graphs by connecting each PID node to the nearest walk edge.
 
 6. **Trip Schedule Extraction:**
-   - Extract and save trip schedules, indicating whether a trip commences on a particular date.
+   - Extract and save trip schedules to `graph_construction/trip_schedules` folder, indicating whether a trip commences on a particular date.
 
 7. **Merge graphs:**
-   - Merge the PID and walk graphs into a final data structure.
+   - Merge the PID and walk graphs into a final data structure and save to `graph_construction/graphs` folder.
    - This merged data structure will be used to efficiently find the shortest path for your application.
 
 ---
